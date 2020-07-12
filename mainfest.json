@@ -1,6 +1,0 @@
-{
-    "name": "yEd-github viewer",
-    "version": "1.0",
-    "description": "Add a viewer button to Github for viewing .graphml files in the yEd-live editor.",
-    "manifest_version": 2
-}
