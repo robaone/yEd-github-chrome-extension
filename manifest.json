@@ -24,7 +24,7 @@
     },
     "content_scripts": [{
       "js": ["content.js"],
-      "matches": ["https://github.com/*.graphml"]
+      "matches": ["https://github.com/*/blob/*.graphml"]
     }],
     "manifest_version": 2
 }
