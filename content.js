@@ -2,7 +2,7 @@ var button_group = document.getElementsByClassName("BtnGroup");
 
 
 function getIconHtml(url) {
-	return '<a class="btn-octicon tooltipped tooltipped-nw js-remove-unless-platform" data-platforms="windows,mac" href="'+url+'" aria-label="Open this file in yEd-live" data-ga-click="Repository, open with yEd-live Editor" target="_new">'+
+	return '<a id="yEdBtn" class="btn-octicon tooltipped tooltipped-nw js-remove-unless-platform" data-platforms="windows,mac" href="'+url+'" aria-label="Open this file in yEd-live" data-ga-click="Repository, open with yEd-live Editor" target="_new">'+
 		'<div style="display:block; width:16px; height:16px">'+
 		'<svg'+
 		'   xmlns:dc="http://purl.org/dc/elements/1.1/"'+
