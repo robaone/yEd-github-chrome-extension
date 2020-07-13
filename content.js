@@ -2,7 +2,7 @@ var button_group = document.getElementsByClassName("BtnGroup");
 
 
 function getIconHtml(url) {
-	return '<a class="btn-octicon tooltipped tooltipped-nw js-remove-unless-platform" data-platforms="windows,mac" href="'+url+'" aria-label="Open this file in yEd-live" data-ga-click="Repository, open with yEd-live Editor">'+
+	return '<a class="btn-octicon tooltipped tooltipped-nw js-remove-unless-platform" data-platforms="windows,mac" href="'+url+'" aria-label="Open this file in yEd-live" data-ga-click="Repository, open with yEd-live Editor" target="_new">'+
 		'<div style="display:block; width:16px; height:16px">'+
 		'<svg'+
 		'   xmlns:dc="http://purl.org/dc/elements/1.1/"'+
@@ -303,8 +303,10 @@ if ( button_group.length > 0 ) {
 	console.log("Adding sibling");
 	if (yed_button == null){
 		var icon_group = button_group[0].nextElementSibling;
-		chrome.storage.sync.get(['url'], function(items) {
-		      icon_group.innerHTML = getIconHtml(items.url) + icon_group.innerHTML;
+		chrome.storage.sync.get(['url','file_info'], function(items) {
+			  var redirect_url = items.url + '?owner=' + items.file_info.owner + '&repo=' + items.file_info.repo + '&file_path=' + items.file_info.file_path + '&branch=' + items.file_info.branch;
+			  console.log("url = "+ redirect_url);
+		      icon_group.innerHTML = getIconHtml(redirect_url) + icon_group.innerHTML;
 		    });
 	}
 }
