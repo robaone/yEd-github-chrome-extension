@@ -12,8 +12,7 @@ chrome.runtime.onInstalled.addListener(function() {
       chrome.declarativeContent.onPageChanged.addRules([{
         conditions: [new chrome.declarativeContent.PageStateMatcher({
           pageUrl: {
-              hostEquals: 'github.com',
-              urlMatches: '([^/]+)\/([^/]+)\/blob\/([^/]+\/([^/]+\/)*[^/]+.graphml)'
+              urlMatches: 'github.com/([^/]+)\/([^/]+)\/blob\/([^/]+\/([^/]+\/)*[^/]+.graphml)'
           },
         })
         ],
