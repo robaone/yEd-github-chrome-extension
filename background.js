@@ -36,8 +36,8 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 
 
 chrome.runtime.onInstalled.addListener(function() {
-    chrome.storage.sync.set({url: 'not set'}, function() {
-      console.log("The url is not set");
+    chrome.storage.sync.set({url: 'https://script.google.com/macros/s/AKfycbwdn8DvT7tmv6k-tzlR_8hxPsx_3ArdByRWufhsZ7zr_pIZF3n7/exec'}, function() {
+      console.log("The default url is set");
     });
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
       chrome.declarativeContent.onPageChanged.addRules([{
