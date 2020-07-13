@@ -22,5 +22,9 @@
       "48": "images/get_started48.png",
       "128": "images/get_started128.png"
     },
+    "content_scripts": [{
+      "js": ["content.js"],
+      "matches": ["https://github.com/*.graphml"]
+    }],
     "manifest_version": 2
 }
