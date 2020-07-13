@@ -2,7 +2,7 @@
     "name": "yEd-github viewer",
     "version": "1.0",
     "description": "Add a viewer button to Github for viewing .graphml files in the yEd-live editor.",
-    "permissions": ["activeTab","declarativeContent","storage"],
+    "permissions": ["tabs","activeTab","declarativeContent","storage","https://github.com/*/blob/*.graphml"],
     "background": {
       "scripts": ["background.js"],
       "persistent": false
@@ -22,9 +22,5 @@
       "48": "images/get_started48.png",
       "128": "images/get_started128.png"
     },
-    "content_scripts": [{
-      "js": ["content.js"],
-      "matches": ["https://github.com/*/blob/*.graphml"]
-    }],
     "manifest_version": 2
 }

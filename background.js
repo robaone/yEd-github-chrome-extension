@@ -7,25 +7,30 @@
 const regex = /([^/]+)\/([^/]+)\/blob\/([^/]+\/([^/]+\/)*[^/]+.graphml)/gm;
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-	if(changeInfo.status == 'loading'){
-		const str = JSON.stringify(tabId);
-		alert(str);
-		let m;
-		
-		while ((m = regex.exec(str)) !== null) {
-		    // This is necessary to avoid infinite loops with zero-width matches
-		    if (m.index === regex.lastIndex) {
-		        regex.lastIndex++;
-		    }
-		    if(m.length >= 4){
-		      let info = {
-		         owner: m[1],
-		         repo: m[2],
-		         file_path: m[3]
-		      };
-		      alert(JSON.stringify(info));
-		    }
-		}
+	if(changeInfo.status == 'complete'){
+		chrome.tabs.get(tabId, function (data){;
+			const str = JSON.stringify(data.url);
+			let m;
+			
+			while ((m = regex.exec(str)) !== null) {
+			    // This is necessary to avoid infinite loops with zero-width matches
+			    if (m.index === regex.lastIndex) {
+			        regex.lastIndex++;
+			    }
+			    if(m.length >= 4){
+			      //alert(JSON.stringify(tab));
+			      let info = {
+			         owner: m[1],
+			         repo: m[2],
+			         file_path: m[3]
+			      };
+			      console.log(JSON.stringify(info));
+			      chrome.tabs.executeScript(
+				          tabId,
+				          {file: 'content.js'});
+			    }
+			}
+		});
 	}
 });
 
