@@ -304,7 +304,7 @@ if ( button_group.length > 0 ) {
 	if (yed_button == null){
 		var icon_group = button_group[0].nextElementSibling;
 		chrome.storage.sync.get(['url','file_info'], function(items) {
-			  var redirect_url = items.url + '?owner=' + items.file_info.owner + '&repo=' + items.file_info.repo + '&file_path=' + items.file_info.file_path + '&branch=' + items.file_info.branch;
+			  var redirect_url = document.getElementById("raw-url").href;
 			  console.log("url = "+ redirect_url);
 		      icon_group.innerHTML = getIconHtml(redirect_url) + icon_group.innerHTML;
 		    });
