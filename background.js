@@ -34,6 +34,11 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 			    }
 			}
 		});
+	}else{
+		var url = changeInfo.url;
+		if(url && url.match(/^https:\/\/raw[.]githubusercontent[.]com\/.*[.]graphml.*/g)) {
+			window.open("https://www.yworks.com/yed-live/?file="+url);
+		}
 	}
 });
 
