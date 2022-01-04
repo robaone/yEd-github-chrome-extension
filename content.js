@@ -302,7 +302,7 @@ console.log(yed_button);
 if ( button_group.length > 0 ) {
 	console.log("Adding sibling");
 	if (yed_button == null){
-		var icon_group = button_group[0].nextElementSibling;
+		var icon_group = button_group[button_group.length - 1].nextElementSibling;
 		var redirect_url = document.getElementById("raw-url").href;
 		console.log("url = "+ redirect_url);
 		icon_group.innerHTML = getIconHtml(redirect_url) + icon_group.innerHTML;
