@@ -8,7 +8,7 @@ const regex = /([^/]+)\/([^/]+)\/blob\/([^/]+)\/(([^/]+\/)*[^/]+.graphml)/gm;
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 	if(changeInfo.status == 'complete'){
-		chrome.tabs.get(tabId, function (data){;
+		chrome.tabs.get(tabId, function (data){
 			const str = JSON.stringify(data.url);
 			let m;
 			
@@ -18,9 +18,10 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 			        regex.lastIndex++;
 			    }
 			    if(m.length >= 4){
-			      chrome.tabs.executeScript(
-			    		  tabId,
-			    		  {file: 'content.js'});
+			      chrome.scripting.executeScript({
+			    		  target: {tabId: tabId},
+			    		  files: ['content.js']
+			      });
 			    }
 			}
 		});

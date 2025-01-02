@@ -1,27 +1,32 @@
 {
-    "name": "yEd-github viewer",
-    "version": "1.0.1",
-    "description": "Add a viewer button to Github for viewing .graphml files in the yEd-live editor.",
-    "permissions": ["tabs","declarativeContent","scripting"],
-    "host_permissions": ["https://github.com/*/blob/*.graphml"],
+    "manifest_version": 3,
+    "name": "yEd-gitHub viewer",
+    "version": "1.1",
+    "description": "A Chrome extension to open .graphml files from GitHub in yEd Live.",
+    "permissions": [
+        "tabs",
+        "activeTab",
+        "scripting",
+        "declarativeContent"
+    ],
+    "host_permissions": [
+        "https://github.com/*",
+        "https://raw.githubusercontent.com/*"
+    ],
     "background": {
-      "service_worker": "background.js",
-      "type": "module"
+        "service_worker": "background.js"
     },
     "action": {
-      "default_popup": "popup.html",
-      "default_icon": {
-        "16": "images/yEd-github16.png",
-        "32": "images/yEd-github32.png",
-        "48": "images/yEd-github48.png",
-        "128": "images/yEd-github128.png"
-      }
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "images/icon16.png",
+            "48": "images/icon48.png",
+            "128": "images/icon128.png"
+        }
     },
     "icons": {
-      "16": "images/yEd-github16.png",
-      "32": "images/yEd-github32.png",
-      "48": "images/yEd-github48.png",
-      "128": "images/yEd-github128.png"
-    },
-    "manifest_version": 3
+        "16": "images/icon16.png",
+        "48": "images/icon48.png",
+        "128": "images/icon128.png"
+    }
 }
