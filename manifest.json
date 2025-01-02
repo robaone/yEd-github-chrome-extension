@@ -17,16 +17,17 @@
         "service_worker": "background.js"
     },
     "action": {
-        "default_popup": "popup.html",
         "default_icon": {
-            "16": "images/icon16.png",
-            "48": "images/icon48.png",
-            "128": "images/icon128.png"
+            "16": "images/yEd-github16.png",
+            "32": "images/yEd-github32.png",
+            "48": "images/yEd-github48.png",
+            "128": "images/yEd-github128.png"
         }
     },
     "icons": {
-        "16": "images/icon16.png",
-        "48": "images/icon48.png",
-        "128": "images/icon128.png"
+        "16": "images/yEd-github16.png",
+        "32": "images/yEd-github32.png",
+        "48": "images/yEd-github48.png",
+        "128": "images/yEd-github128.png"
     }
 }
