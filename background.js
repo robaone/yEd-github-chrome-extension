@@ -4,49 +4,26 @@
 
 'use strict';
 
-const regex = /([^/]+)\/([^/]+)\/blob\/([^/]+)\/(([^/]+\/)*[^/]+.graphml)/gm;
+const BLOB_REGEX = /^https:\/\/(?:www\.)?github\.com\/[^/]+\/[^/]+\/blob\/[^/]+\/.*\.graphml(?:\?.*)?$/i;
+const RAW_REGEX = /^https:\/\/raw\.githubusercontent\.com\/.*\.graphml(?:\?.*)?$/i;
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-	if(changeInfo.status == 'complete'){
-		chrome.tabs.get(tabId, function (data){
-			const str = JSON.stringify(data.url);
-			let m;
-			
-			while ((m = regex.exec(str)) !== null) {
-			    // This is necessary to avoid infinite loops with zero-width matches
-			    if (m.index === regex.lastIndex) {
-			        regex.lastIndex++;
-			    }
-			    if(m.length >= 4){
-			      chrome.scripting.executeScript({
-			    		  target: {tabId: tabId},
-			    		  files: ['content.js']
-			      });
-			    }
-			}
-		});
-	}else{
-		var url = changeInfo.url;
-		if(url && url.match(/^https:\/\/raw[.]githubusercontent[.]com\/.*[.]graphml.*/g)) {
-		  // open a new tab
-			chrome.tabs.create({ url: "https://www.yworks.com/yed-live/?file="+url });
+	const url = changeInfo.url || (tab && tab.url);
+	if (!url) return;
+
+	if (RAW_REGEX.test(url)) {
+		if (changeInfo.url) {
+			chrome.tabs.create({ url: "https://www.yworks.com/yed-live/?file=" + encodeURIComponent(url) });
+		}
+	} else if (BLOB_REGEX.test(url)) {
+		if (changeInfo.status === 'complete' || changeInfo.url) {
+			chrome.scripting.executeScript({
+				target: { tabId: tabId },
+				files: ['content.js']
+			}).catch(function() {
+				// Ignore errors if tab was closed or cannot be scripted
+			});
 		}
 	}
 });
 
-
-chrome.runtime.onInstalled.addListener(function() {
-    chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-      chrome.declarativeContent.onPageChanged.addRules([{
-        conditions: [new chrome.declarativeContent.PageStateMatcher({
-          pageUrl: {
-              urlMatches: 'github.com'
-          },
-        })
-        ],
-        actions: [
-        	new chrome.declarativeContent.ShowPageAction()
-        ]
-      }]);
-    });
-});
