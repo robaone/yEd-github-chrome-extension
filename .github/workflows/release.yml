@@ -4,19 +4,21 @@ on:
     tags:
     - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
-name: Upload Release Asset
+name: Upload Release Assets
 
 jobs:
   build:
-    name: Upload Release Asset
+    name: Upload Release Assets
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Build project # This would actually build your project, using zip for an example artifact
+      - name: Build packages
         run: |
-          mkdir target
-          zip -r target/yEd-github.zip images background.js content.js manifest.json
+          mkdir -p target
+          zip -r target/yEd-github-chrome.zip images background.js content.js manifest.json
+          zip -r target/yEd-github-firefox.zip images background.js content.js manifest.json
+          cp target/yEd-github-chrome.zip target/yEd-github.zip
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1.1.4
@@ -27,13 +29,33 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
-      - name: Upload Release Asset
-        id: upload-release-asset 
+      - name: Upload Chrome Release Asset
+        id: upload-release-asset-chrome
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./target/yEd-github-chrome.zip
+          asset_name: yEd-github-chrome.zip
+          asset_content_type: application/zip
+      - name: Upload Firefox Release Asset
+        id: upload-release-asset-firefox
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./target/yEd-github-firefox.zip
+          asset_name: yEd-github-firefox.zip
+          asset_content_type: application/zip
+      - name: Upload Default Release Asset
+        id: upload-release-asset-default
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./target/yEd-github.zip
           asset_name: yEd-github.zip
           asset_content_type: application/zip

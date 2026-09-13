@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Publish Chrome Extension
+name: Package Browser Extensions
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -23,13 +23,27 @@ jobs:
     - uses: actions/checkout@v4
 
     # Runs a single command using the runners shell
-    - name: Zip the resources
+    - name: Zip extension packages
       run: |
-        mkdir target
-        zip -r target/yEd-github.zip images background.js content.js manifest.json
+        mkdir -p target
+        zip -r target/yEd-github-chrome.zip images background.js content.js manifest.json
+        zip -r target/yEd-github-firefox.zip images background.js content.js manifest.json
+        cp target/yEd-github-chrome.zip target/yEd-github.zip
 
-    # Runs a set of commands using the runners shell
-    - uses: actions/upload-artifact@v4
+    - name: Upload Chrome Extension Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: yEd-github-chrome
+        path: target/yEd-github-chrome.zip
+
+    - name: Upload Firefox Extension Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: yEd-github-firefox
+        path: target/yEd-github-firefox.zip
+
+    - name: Upload Default Artifact
+      uses: actions/upload-artifact@v4
       with:
         name: yEd-github
         path: target/yEd-github.zip
