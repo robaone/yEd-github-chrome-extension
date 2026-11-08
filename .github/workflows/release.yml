@@ -4,36 +4,27 @@ on:
     tags:
     - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
-name: Upload Release Asset
+name: Upload Release Assets
 
 jobs:
   build:
-    name: Upload Release Asset
+    name: Upload Release Assets
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Build project # This would actually build your project, using zip for an example artifact
+      - name: Build packages
         run: |
-          mkdir target
-          zip target/yEd-github.zip images/* background.js content.js manifest.json popup.html popup.js
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1.1.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          mkdir -p target
+          zip -r target/yEd-github-chrome.zip images background.js content.js manifest.json
+          zip -r target/yEd-github-firefox.zip images background.js content.js manifest.json
+          cp target/yEd-github-chrome.zip target/yEd-github.zip
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-      - name: Upload Release Asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./target/yEd-github.zip
-          asset_name: yEd-github.zip
-          asset_content_type: application/zip
+          files: |
+            target/yEd-github-chrome.zip
+            target/yEd-github-firefox.zip
+            target/yEd-github.zip
