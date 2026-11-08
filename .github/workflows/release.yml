@@ -10,6 +10,8 @@ jobs:
   build:
     name: Upload Release Assets
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,43 +21,10 @@ jobs:
           zip -r target/yEd-github-chrome.zip images background.js content.js manifest.json
           zip -r target/yEd-github-firefox.zip images background.js content.js manifest.json
           cp target/yEd-github-chrome.zip target/yEd-github.zip
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1.1.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-      - name: Upload Chrome Release Asset
-        id: upload-release-asset-chrome
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/yEd-github-chrome.zip
-          asset_name: yEd-github-chrome.zip
-          asset_content_type: application/zip
-      - name: Upload Firefox Release Asset
-        id: upload-release-asset-firefox
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/yEd-github-firefox.zip
-          asset_name: yEd-github-firefox.zip
-          asset_content_type: application/zip
-      - name: Upload Default Release Asset
-        id: upload-release-asset-default
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/yEd-github.zip
-          asset_name: yEd-github.zip
-          asset_content_type: application/zip
+          files: |
+            target/yEd-github-chrome.zip
+            target/yEd-github-firefox.zip
+            target/yEd-github.zip
