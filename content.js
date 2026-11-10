@@ -7,6 +7,11 @@ const SVG_STRING = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
 	'</g>' +
 	'</svg>';
 
+function isGraphmlBlobPage() {
+	const current = window.location.pathname + window.location.search + window.location.hash;
+	return /\.graphml(?:\?[^#]*)?(?:#.*)?$/i.test(current);
+}
+
 function getRawUrl() {
 	const rawBtn = document.querySelector('a[data-testid="raw-button"]') ||
 	               document.getElementById('raw-url') ||
@@ -22,35 +27,111 @@ function getRawUrl() {
 	return null;
 }
 
-function createYedButton(rawUrl) {
-	const yedUrl = 'https://www.yworks.com/yed-live/?file=' + encodeURIComponent(rawUrl);
-	const a = document.createElement('a');
-	a.id = 'yEdBtn';
-	a.className = 'btn-octicon tooltipped tooltipped-nw js-remove-unless-platform';
-	a.setAttribute('data-platforms', 'windows,mac');
-	a.setAttribute('aria-label', 'Open this file in yEd-live');
-	a.setAttribute('title', 'Open this file in yEd-live');
-	a.setAttribute('data-ga-click', 'Repository, open with yEd-live Editor');
-	a.href = yedUrl;
-	a.target = '_blank';
-	a.rel = 'noopener noreferrer';
+function getSiblingButtonClass() {
+	const siblingButton = document.querySelector('button[data-testid="download-raw-button"]') ||
+	                      document.querySelector('button[data-testid="copy-raw-button"]') ||
+	                      document.querySelector('a[data-testid="raw-button"]');
+	if (siblingButton && siblingButton.className) {
+		return siblingButton.className;
+	}
+	return 'btn btn-sm btn-octicon';
+}
 
-	const div = document.createElement('div');
-	div.style.cssText = 'display:flex;align-items:center;justify-content:center;width:16px;height:16px;';
+function createYedIconSvg() {
+	const iconContainer = document.createElement('div');
+	iconContainer.style.cssText = 'display:flex;align-items:center;justify-content:center;width:16px;height:16px;';
 
 	const parser = new DOMParser();
 	const svgDoc = parser.parseFromString(SVG_STRING, 'image/svg+xml');
 	const svg = svgDoc.documentElement;
-	svg.setAttribute('width', '100%');
-	svg.setAttribute('height', '100%');
-	div.appendChild(svg);
-	a.appendChild(div);
+	svg.setAttribute('width', '16');
+	svg.setAttribute('height', '16');
+	iconContainer.appendChild(svg);
+	return iconContainer;
+}
 
-	return a;
+function createYedElement(rawUrl, itemClass) {
+	const yedUrl = 'https://www.yworks.com/yed-live/?file=' + encodeURIComponent(rawUrl);
+	const anchor = document.createElement('a');
+	anchor.id = 'yEdBtn';
+	anchor.href = yedUrl;
+	anchor.target = '_blank';
+	anchor.rel = 'noopener noreferrer';
+	anchor.setAttribute('aria-label', 'Open this file in yEd-live');
+	anchor.setAttribute('title', 'Open this file in yEd-live');
+	anchor.setAttribute('data-testid', 'yed-live-button');
+	anchor.className = getSiblingButtonClass();
+
+	anchor.style.display = 'inline-flex';
+	anchor.style.alignItems = 'center';
+	anchor.style.justifyContent = 'center';
+	anchor.style.height = 'var(--control-small-size, 28px)';
+	anchor.style.minWidth = 'var(--control-small-size, 28px)';
+	anchor.style.boxSizing = 'border-box';
+	anchor.style.textDecoration = 'none';
+
+	anchor.appendChild(createYedIconSvg());
+
+	if (itemClass) {
+		const wrapper = document.createElement('div');
+		wrapper.id = 'yEdBtnWrapper';
+		wrapper.className = itemClass;
+		wrapper.appendChild(anchor);
+		return wrapper;
+	}
+
+	return anchor;
+}
+
+function resolveInsertionTarget() {
+	const primerButtonGroup = document.querySelector('[data-component="ButtonGroup"]') ||
+	                          document.querySelector('a[data-testid="raw-button"]')?.closest('[data-component="ButtonGroup"]');
+	if (primerButtonGroup) {
+		const itemClass = primerButtonGroup.firstElementChild ? primerButtonGroup.firstElementChild.className : '';
+		return { container: primerButtonGroup, referenceNode: null, itemClass };
+	}
+
+	const actionContainer = document.querySelector('.react-blob-header-edit-and-raw-actions') ||
+	                        document.querySelector('[data-testid="blob-actions"]') ||
+	                        document.querySelector('.Box-header .d-flex');
+	if (actionContainer) {
+		return { container: actionContainer, referenceNode: null, itemClass: null };
+	}
+
+	const legacyButtonGroup = document.getElementsByClassName('BtnGroup');
+	if (legacyButtonGroup.length > 0) {
+		const iconGroup = legacyButtonGroup[legacyButtonGroup.length - 1].nextElementSibling;
+		if (iconGroup) {
+			return { container: iconGroup, referenceNode: iconGroup.firstChild, itemClass: null };
+		}
+	}
+
+	const rawBtn = document.querySelector('a[data-testid="raw-button"]') ||
+	               document.getElementById('raw-url') ||
+	               document.querySelector('a[data-test-selector="raw-url"]') ||
+	               document.querySelector('a[href*="/raw/"]');
+	if (rawBtn && rawBtn.parentElement) {
+		const parent = rawBtn.parentElement;
+		if (parent.parentElement) {
+			return { container: parent.parentElement, referenceNode: parent.nextSibling, itemClass: null };
+		}
+		return { container: parent, referenceNode: rawBtn.nextSibling, itemClass: null };
+	}
+
+	return null;
 }
 
 function injectYedButton() {
-	if (document.getElementById('yEdBtn')) {
+	if (!isGraphmlBlobPage()) {
+		const existing = document.getElementById('yEdBtnWrapper') || document.getElementById('yEdBtn');
+		if (existing) {
+			existing.remove();
+		}
+		return;
+	}
+
+	const existingBtn = document.getElementById('yEdBtn');
+	if (existingBtn && document.contains(existingBtn)) {
 		return;
 	}
 
@@ -59,39 +140,44 @@ function injectYedButton() {
 		return;
 	}
 
-	const rawBtn = document.querySelector('a[data-testid="raw-button"]') ||
-	               document.getElementById('raw-url') ||
-	               document.querySelector('a[data-test-selector="raw-url"]') ||
-	               document.querySelector('a[href*="/raw/"]');
-
-	const btn = createYedButton(rawUrl);
-
-	if (rawBtn && rawBtn.parentElement) {
-		rawBtn.parentElement.insertBefore(btn, rawBtn.nextSibling);
+	const target = resolveInsertionTarget();
+	if (!target || !target.container) {
 		return;
 	}
 
-	const buttonGroup = document.getElementsByClassName('BtnGroup');
-	if (buttonGroup.length > 0) {
-		const iconGroup = buttonGroup[buttonGroup.length - 1].nextElementSibling;
-		if (iconGroup) {
-			iconGroup.insertBefore(btn, iconGroup.firstChild);
-			return;
-		}
+	const element = createYedElement(rawUrl, target.itemClass);
+	if (target.referenceNode) {
+		target.container.insertBefore(element, target.referenceNode);
+	} else {
+		target.container.appendChild(element);
 	}
+}
 
-	const actionContainer = document.querySelector('[data-testid="blob-actions"]') ||
-	                        document.querySelector('.Box-header .d-flex');
-	if (actionContainer) {
-		actionContainer.appendChild(btn);
+let scheduledFrame = null;
+function scheduleInject() {
+	if (scheduledFrame !== null) {
+		return;
 	}
+	scheduledFrame = requestAnimationFrame(function() {
+		scheduledFrame = null;
+		injectYedButton();
+	});
 }
 
 if (!window.__yedViewerInitialized) {
 	window.__yedViewerInitialized = true;
-	document.addEventListener('turbo:load', injectYedButton);
-	document.addEventListener('turbo:render', injectYedButton);
-	document.addEventListener('pjax:end', injectYedButton);
+
+	const observer = new MutationObserver(scheduleInject);
+	observer.observe(document.body || document.documentElement, {
+		childList: true,
+		subtree: true
+	});
+
+	document.addEventListener('turbo:load', scheduleInject);
+	document.addEventListener('turbo:render', scheduleInject);
+	document.addEventListener('pjax:end', scheduleInject);
+	window.addEventListener('popstate', scheduleInject);
+	window.addEventListener('hashchange', scheduleInject);
 }
 
 injectYedButton();

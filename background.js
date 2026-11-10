@@ -4,8 +4,8 @@
 
 'use strict';
 
-const BLOB_REGEX = /^https:\/\/(?:www\.)?github\.com\/[^/]+\/[^/]+\/blob\/[^/]+\/.*\.graphml(?:\?.*)?$/i;
-const RAW_REGEX = /^https:\/\/raw\.githubusercontent\.com\/.*\.graphml(?:\?.*)?$/i;
+const BLOB_REGEX = /^https:\/\/(?:www\.)?github\.com\/[^/]+\/[^/]+\/blob\/[^/]+\/.*\.graphml(?:\?[^#]*)?(?:#.*)?$/i;
+const RAW_REGEX = /^https:\/\/raw\.githubusercontent\.com\/.*\.graphml(?:\?[^#]*)?(?:#.*)?$/i;
 
 function handleRawRedirect(url, changeInfo) {
 	if (!changeInfo.url || !RAW_REGEX.test(url)) {
